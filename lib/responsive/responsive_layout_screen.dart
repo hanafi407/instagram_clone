@@ -21,7 +21,7 @@ class _ResponsiveLayoutScreenState extends State<ResponsiveLayoutScreen> {
     // TODO: implement initState
     super.initState();
 
-    FirebaseAuth.instance.signOut();
+    // FirebaseAuth.instance.signOut();
 
     UserProvider _userProvider = Provider.of(context, listen: false);
     _userProvider.refreshUser();

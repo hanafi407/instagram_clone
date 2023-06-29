@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/provider/user_provider.dart';
 import 'package:instagram_clone/resources/firestores_methods.dart';
 import 'package:instagram_clone/screen/comment_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,28 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool isLikeAnimating = false;
+  int commentLength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getCommentLength();
+  }
+
+  getCommentLength() async {
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.snap['idPost'])
+          .collection('comments')
+          .get();
+
+      commentLength = snap.docs.length;
+      setState(() {});
+    } catch (err) {
+      showSnackbar(context, err.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +86,10 @@ class _PostCardState extends State<PostCard> {
                             shrinkWrap: true,
                             children: ['delete']
                                 .map((e) => InkWell(
-                                      onTap: () {},
+                                      onTap: () async {
+                                        await FirestoreMethods().deletePost(widget.snap['idPost']);
+                                        Navigator.pop(context);
+                                      },
                                       child: Container(
                                           padding:
                                               EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -196,7 +223,7 @@ class _PostCardState extends State<PostCard> {
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: Text(
-                        'View all 200 comments',
+                        'View all $commentLength comments',
                         style: TextStyle(color: secondaryColor, fontSize: 16),
                       ),
                     ),
