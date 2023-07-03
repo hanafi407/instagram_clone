@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,14 +11,11 @@ import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
-import '../responsive/mobile_screen_layout.dart';
-import '../responsive/responsive_layout_screen.dart';
-import '../responsive/web_screen_layout.dart';
-
 class SignupScreen extends StatefulWidget {
   static String routeName = 'signup-screen';
+  String? uid;
 
-  const SignupScreen({super.key});
+  SignupScreen({super.key, this.uid});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -30,6 +28,13 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _usernameController = TextEditingController();
   Uint8List? _image;
   bool isLoading = false;
+  Map _userData = {};
+
+  isProfile() async {
+    var userData = await FirebaseFirestore.instance.collection('users').doc(widget.uid).get();
+
+    _userData = userData.data()!;
+  }
 
   selectImage() async {
     print('select Image');
@@ -38,6 +43,8 @@ class _SignupScreenState extends State<SignupScreen> {
       _image = im;
     });
   }
+
+  editProfile() {}
 
   signUpUser() async {
     ByteData byte = await rootBundle.load('assets/images/default_images.jpg');
@@ -53,25 +60,22 @@ class _SignupScreenState extends State<SignupScreen> {
       bio: _bioController.text,
       file: _image!,
     );
-    
+
     if (res != 'success') {
       setState(() {
         isLoading = false;
       });
       showSnackbar(context, res);
-      
     } else {
-       setState(() {
+      setState(() {
         isLoading = false;
       });
+
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ResponsiveLayoutScreen(
-            mobileScreenLayout: MobileScreenLayout(),
-            webScreenLayout: WebScreenLayout(),
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
+
+      showSnackbar(context, 'Sign up successed');
     }
   }
 
@@ -138,23 +142,34 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFieldInput(
-                    textEditingController: _emailController,
-                    hint: 'Enter your email',
-                    textInputType: TextInputType.emailAddress,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFieldInput(
-                    textEditingController: _passwordController,
-                    hint: 'Enter your password',
-                    textInputType: TextInputType.text,
-                    isPass: true,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  widget.uid == null
+                      ? Column(children: [
+                          TextFieldInput(
+                            textEditingController: _emailController,
+                            hint: 'Enter your email',
+                            textInputType: TextInputType.emailAddress,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ])
+                      : SizedBox.shrink(),
+                  widget.uid == null
+                      ? Column(
+                          children: [
+                            TextFieldInput(
+                              textEditingController: _passwordController,
+                              hint: 'Enter your password',
+                              textInputType: TextInputType.text,
+                              isPass: true,
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                          ],
+                        )
+                      : Container(),
+
                   TextFieldInput(
                     textEditingController: _bioController,
                     hint: 'Enter your bio',
@@ -164,14 +179,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     height: 20,
                   ),
                   InkWell(
-                    onTap: signUpUser,
+                    onTap: widget.uid == null ? signUpUser : editProfile,
                     child: Container(
-                      child: isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ))
-                          : const Text('Sign up'),
                       width: double.infinity,
                       height: 45,
                       alignment: Alignment.center,
@@ -180,6 +189,12 @@ class _SignupScreenState extends State<SignupScreen> {
                           color: blueColor,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(Radius.circular(4)))),
+                      child: isLoading
+                          ? Center(
+                              child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ))
+                          : Text(widget.uid == null ? 'Sign up' : 'edit'),
                     ),
                   ),
                   // ElevatedButton(
@@ -190,25 +205,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: const Text("Have an account? "),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ));
-                        },
-                        child: Container(
-                          child:
-                              const Text('Sign in', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      )
-                    ],
-                  )
+                  widget.uid == null
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              child: const Text("Have an account? "),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ));
+                              },
+                              child: Container(
+                                child: const Text('Sign in',
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            )
+                          ],
+                        )
+                      : Container()
                 ],
               ),
             ],

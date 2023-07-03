@@ -33,15 +33,17 @@ class AuthMethods {
 
     try {
       print('try');
-      if (email.isNotEmpty || password.isNotEmpty || username.isNotEmpty || bio.isNotEmpty
-          // file != null,
-          ) {
+      if (email.isNotEmpty ||
+          password.isNotEmpty ||
+          username.isNotEmpty ||
+          bio.isNotEmpty ||
+          file != null) {
         UserCredential _cred =
             await _auth.createUserWithEmailAndPassword(email: email, password: password);
 
         print('uid= ${_cred.user!.uid}');
 
-        String photoUrl = await StorageMethods().uploadImageToStorage('profilePics', file, false);
+        String photoUrl = await StorageMethods().uploadImageToStorage('profilePics', file);
 
         model.User user = model.User(
             username: username,
@@ -78,5 +80,9 @@ class AuthMethods {
     }
 
     return res;
+  }
+
+  Future<void> signOut() async{
+   await _auth.signOut();
   }
 }

@@ -16,12 +16,13 @@ void main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
-        apiKey: 'AIzaSyAPBoxMCfuwCHh_KLNV3LPUGJs02W-_RfE',
-        appId: "1:491224207894:web:dbc4f20f4f232169711b37",
-        messagingSenderId: "491224207894",
-        projectId: "instagram-clone-a5947",
-        storageBucket: "instagram-clone-a5947",
-      ),
+          apiKey: "AIzaSyAPBoxMCfuwCHh_KLNV3LPUGJs02W-_RfE",
+          authDomain: "instagram-clone-a5947.firebaseapp.com",
+          projectId: "instagram-clone-a5947",
+          storageBucket: "instagram-clone-a5947.appspot.com",
+          messagingSenderId: "491224207894",
+          appId: "1:491224207894:web:02879f43b8cfbeee711b37",
+          measurementId: "G-2Q9LHD8PEB"),
     );
   } else {
     await Firebase.initializeApp();
@@ -52,7 +53,7 @@ class MainApp extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.active) {
               if (snapshot.hasData) {
                 return Scaffold(
-                  body: const ResponsiveLayoutScreen(
+                  body: ResponsiveLayoutScreen(
                     mobileScreenLayout: MobileScreenLayout(),
                     webScreenLayout: WebScreenLayout(),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/screen/signup_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variable.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
@@ -57,12 +58,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var widthDevice = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.all(32),
+        padding: widthDevice > webScreenSize
+            ? EdgeInsets.symmetric(horizontal: widthDevice * 0.3)
+            : EdgeInsets.all(32),
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(),
             Column(
@@ -94,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 InkWell(
                   onTap: signInUser,
                   child: Container(
-                    
                     width: double.infinity,
                     height: 45,
                     alignment: Alignment.center,

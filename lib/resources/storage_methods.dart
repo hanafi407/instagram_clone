@@ -5,16 +5,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 
 class StorageMethods {
-  FirebaseStorage _storage = FirebaseStorage.instance;
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<String> uploadImageToStorage(String childName, Uint8List file, bool isPost) async {
+  Future<String> uploadImageToStorage(String childName,Uint8List file,[String? postId]) async {
     Reference ref = _storage.ref().child(childName).child(_auth.currentUser!.uid);
+    
 
-    if (isPost) {
-      var idPost = Uuid().v1();
-
-      ref = ref.child(idPost);
+    if (postId!=null) {
+      ref = ref.child(postId);
     }
 
     UploadTask uploadTask = ref.putData(file);
@@ -24,5 +23,10 @@ class StorageMethods {
     String downloadUrl = await snap.ref.getDownloadURL();
 
     return downloadUrl;
+  }
+
+  delete(String childName,){
+    Reference ref = _storage.ref().child(childName).child(_auth.currentUser!.uid);
+
   }
 }

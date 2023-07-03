@@ -7,14 +7,15 @@ import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreMethods {
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<String> uploadPost(
       String description, Uint8List file, String username, String uid, String profImage) async {
     String res = 'some error occur';
     try {
-      var photoUrl = await StorageMethods().uploadImageToStorage('posts', file, true);
+      var postId = Uuid().v1();
 
-      var idPost = Uuid().v1();
+      var photoUrl = await StorageMethods().uploadImageToStorage('posts', file, postId);
 
       Post post = Post(
         description: description,
@@ -22,12 +23,12 @@ class FirestoreMethods {
         uid: uid,
         datePublished: DateTime.now(),
         postUrl: photoUrl,
-        idPost: idPost,
+        idPost: postId,
         profImage: profImage,
         likes: [],
       );
 
-      _firestore.collection('posts').doc(idPost).set(post.toJson());
+      _firestore.collection('posts').doc(postId).set(post.toJson());
 
       res = 'success';
     } catch (err) {
@@ -109,11 +110,49 @@ class FirestoreMethods {
     }
   }
 
-  deletePost(String postId)async {
+  deletePost(String postId) async {
     try {
-     await _firestore.collection('posts').doc(postId).delete();
+      await _firestore.collection('posts').doc(postId).delete();
     } catch (err) {
       print(err.toString());
     }
   }
+
+ Future<void> followUser(String currentUserUid, String userUid) async {
+    try {
+      //doc current user uid
+      var refCurrentUserUid = _firestore.collection('users').doc(currentUserUid);
+
+      DocumentSnapshot snapCurrentUser = await refCurrentUserUid.get();
+
+      List followingCurrentUser = (snapCurrentUser.data()! as Map<String, dynamic>)['following'];
+
+      //doc user uid
+      var refUserUid = _firestore.collection('users').doc(userUid);
+
+      DocumentSnapshot snapUser = await refUserUid.get();
+
+      if (followingCurrentUser.contains(userUid)) {
+        await refCurrentUserUid.update({
+          'following': FieldValue.arrayRemove([userUid])
+        });
+
+        await refUserUid.update({
+          'followers': FieldValue.arrayRemove([currentUserUid])
+        });
+      } else {
+        await refCurrentUserUid.update({
+          'following': FieldValue.arrayUnion([userUid])
+        });
+
+        await refUserUid.update({
+          'followers': FieldValue.arrayUnion([currentUserUid])
+        });
+      }
+    } catch (err) {
+      print(err.toString());
+    }
+  }
+
+  
 }

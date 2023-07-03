@@ -6,13 +6,15 @@ class TextFieldInput extends StatelessWidget {
   final bool isPass;
   final String hint;
   final TextInputType textInputType;
+  final VoidCallback? myFunc;
 
   const TextFieldInput(
       {super.key,
       required this.textEditingController,
       this.isPass = false,
       required this.hint,
-      required this.textInputType});
+      required this.textInputType,
+      this.myFunc});
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,9 @@ class TextFieldInput extends StatelessWidget {
       ),
       keyboardType: textInputType,
       obscureText: isPass,
+      onSubmitted: (_) {
+        myFunc != null ? myFunc!() : print(_);
+      },
     );
   }
 }

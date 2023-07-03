@@ -31,14 +31,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     pageController = PageController();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     pageController.dispose();
   }
@@ -48,46 +46,48 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
     // model.User user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       body: Center(
-          child: PageView(
-        physics: NeverScrollableScrollPhysics(),
-        controller: pageController,
-        onPageChanged: pageChanged,
-        children: homeScreenItems,
-      )),
+        child: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: pageController,
+          onPageChanged: pageChanged,
+          children: homeScreenItems,
+        ),
+      ),
       bottomNavigationBar: CupertinoTabBar(
+        height: 70,
         backgroundColor: mobileBackgroundColor,
         items: [
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.home,
+                _page == 0 ? Icons.home : Icons.home_outlined,
                 color: _page == 0 ? primaryColor : secondaryColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.search,
+                Icons.search_outlined,
                 color: _page == 1 ? primaryColor : secondaryColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.add_circle,
+                _page == 2 ? Icons.add_circle : Icons.add_circle_outline,
                 color: _page == 2 ? primaryColor : secondaryColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.favorite,
+                _page == 3 ? Icons.favorite : Icons.favorite_outline,
                 color: _page == 3 ? primaryColor : secondaryColor,
               ),
               label: '',
               backgroundColor: primaryColor),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.person,
+                _page == 04 ? Icons.person : Icons.person_outline,
                 color: _page == 04 ? primaryColor : secondaryColor,
               ),
               label: '',
